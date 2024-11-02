@@ -15,7 +15,7 @@
       "name": "Отладчик Python: Модуль",
       "type": "debugpy",
       "request": "launch",
-      "module": "QIG"
+      "module": "quote_image_generator"
     }
   ]
 }

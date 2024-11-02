@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "QIG"
+name = "quote-image-generator"
 version = "0.1.0"
 description = ""
 authors = ["lordralinc <lordralinc@gmail.com>"]
