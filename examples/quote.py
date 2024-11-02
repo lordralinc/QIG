@@ -9,6 +9,11 @@ from quote_image_generator import QuoteGenerator, pipelines, processors, types
 logging.basicConfig(level=logging.DEBUG)
 
 
+if not pathlib.Path("emoji", "full-emoji-list.html").exists():
+    emoji_source = processors.FileEmojiSource(pathlib.Path("emoji"))
+    emoji_source.download_from_unicode()
+    emoji_source.parse_from_unicode_html()
+
 generator = QuoteGenerator(
     bi=(1600, 900),
     pipeline=[
@@ -31,9 +36,7 @@ generator = QuoteGenerator(
             code=(255, 0, 0),
         ),
     ),
-    text_processor=processors.TextProcessor(
-        emoji_source=processors.FileEmojiSource(pathlib.Path("emoji"))
-    ),
+    text_processor=processors.TextProcessor(emoji_source=emoji_source),
 )
 
 
