@@ -9,19 +9,24 @@ if typing.TYPE_CHECKING:
 
 class BasePipeLine(abc.ABC):
 
+    def __init__(self, **kwargs) -> None:
+        self.pipe_kwargs = kwargs
+
     @abc.abstractmethod
     def pipe(
         self, im: Image.Image, generator: "QuoteGenerator", /, **kwargs
-    ) -> None | dict[str, typing.Any]: ...
+    ) -> typing.Optional[dict[str, typing.Any]]: ...
 
 
 class RedirectKeywordPipeLine(BasePipeLine, abc.ABC):
     def __init__(
         self,
         key: str,
-        required_keys: list[str] | None = None,
-        optional_keys: list[str] | None = None,
+        required_keys: typing.Optional[list[str]] = None,
+        optional_keys: typing.Optional[list[str]] = None,
+        **kwargs,
     ):
+        super().__init__(**kwargs)
         self.key = key
         self.required_keys = required_keys or getattr(self, "REQUIRED_ARGS", [])
         self.optional_keys = optional_keys or getattr(self, "OPTIONAL_ARGS", [])
@@ -40,11 +45,11 @@ class RedirectKeywordPipeLine(BasePipeLine, abc.ABC):
     @abc.abstractmethod
     def _pipe(
         self, im: Image.Image, generator: "QuoteGenerator", /, **kwargs
-    ) -> None | dict[str, typing.Any]: ...
+    ) -> typing.Optional[dict[str, typing.Any]]: ...
 
     def pipe(
         self, im: Image.Image, generator: "QuoteGenerator", /, **kwargs
-    ) -> None | dict[str, typing.Any]:
+    ) -> typing.Optional[dict[str, typing.Any]]:
         return self._pipe(
             im,
             generator,

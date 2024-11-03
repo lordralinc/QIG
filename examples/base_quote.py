@@ -6,18 +6,27 @@ from PIL import Image
 
 from quote_image_generator import QuoteGenerator, pipelines, processors, types
 
-logging.basicConfig(level=logging.DEBUG)
+try:
+    from rich.logging import RichHandler
 
+    logging.basicConfig(
+        level="NOTSET",
+        format="%(message)s",
+        datefmt="[%X]",
+        handlers=[RichHandler()],
+    )
+except ImportError:
+    logging.basicConfig(level=logging.DEBUG)
 
+emoji_source = processors.FileEmojiSource(pathlib.Path("emoji"))
 if not pathlib.Path("emoji", "full-emoji-list.html").exists():
-    emoji_source = processors.FileEmojiSource(pathlib.Path("emoji"))
     emoji_source.download_from_unicode()
     emoji_source.parse_from_unicode_html()
 
 generator = QuoteGenerator(
     bi=(1600, 900),
     pipeline=[
-        pipelines.GradientBackgroundPipeLine(),
+        pipelines.StaticColorBackgroundPipeLine(),
         pipelines.TextPipeLine(key="title"),
         pipelines.EntitiesPipeLine(key="quote"),
         pipelines.CircleImagePipeLine("author_image"),
@@ -37,12 +46,14 @@ generator = QuoteGenerator(
         ),
     ),
     text_processor=processors.TextProcessor(emoji_source=emoji_source),
+    debug=False,
 )
 
 
 output = generator.generate_quote(
     background_from_color=(255, 0, 0),
     background_to_color=(0, 0, 255),
+    background_color=(0, 0, 0),
     background_direction="lt-rb",
     title_content="❤️‍🔥 Цитаты великих людей ❤️‍🔥",
     title_box=types.SizeBox(50, 50, 1500, 50),
@@ -57,4 +68,4 @@ output = generator.generate_quote(
     author_image_box=types.SizeBox(x=50, y=685, width=200, height=200),
 )
 
-Image.open(io.BytesIO(output)).save("pics/quote.png")
+Image.open(io.BytesIO(output)).save("pics/base_quote.png")

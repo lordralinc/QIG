@@ -1,5 +1,25 @@
 import typing
 
+import typing_extensions
+
+__all__ = (
+    "Point",
+    "Size",
+    "SizeBox",
+    "PointBox",
+    "FontSet",
+    "Color",
+    "ColorSet",
+    "InputEntityType",
+    "InputEntity",
+    "EmojiDrawEntity",
+    "NewLineDrawEntity",
+    "TextDrawEntityTypes",
+    "TextDrawEntity",
+    "DrawEntity",
+    "type_cast",
+)
+
 
 class Point(typing.NamedTuple):
     x: int
@@ -58,7 +78,9 @@ class FontSet(typing.NamedTuple):
     mono: str
 
 
-type Color = str | tuple[int, int, int] | tuple[int, int, int, int]
+Color: typing_extensions.TypeAlias = typing.Union[
+    str, tuple[int, int, int], tuple[int, int, int, int]
+]
 
 
 class ColorSet(typing.NamedTuple):
@@ -67,15 +89,16 @@ class ColorSet(typing.NamedTuple):
     code: Color
 
 
-type InputEntityType = typing.Literal[
+InputEntityType = typing.Literal[
+    "link",
     "bold",
     "italic",
+    "underline",
+    "strikethrough",
     "code",
     "code_block",
     "quote",
     "emoji",
-    "link",
-    "underline",
 ]
 
 
@@ -83,7 +106,7 @@ class InputEntity(typing.TypedDict):
     type: InputEntityType
     offset: int
     length: int
-    emoji_image: typing.NotRequired[bytes]
+    emoji_image: typing_extensions.NotRequired[bytes]
 
 
 class EmojiDrawEntity(typing.TypedDict):
@@ -99,15 +122,17 @@ class NewLineDrawEntity(typing.TypedDict):
     length: int
 
 
-type TextDrawEntityTypes = typing.Literal[
+TextDrawEntityTypes = typing.Literal[
     "default",
+    "link",
     "bold",
     "italic",
+    "underline",
+    "strikethrough",
     "code",
     "code_block",
     "quote",
-    "link",
-    "underline",
+    "emoji",
 ]
 
 
@@ -120,10 +145,16 @@ class TextDrawEntity(typing.TypedDict):
     color: Color
 
 
-type DrawEntity = EmojiDrawEntity | NewLineDrawEntity | TextDrawEntity
+DrawEntity: typing_extensions.TypeAlias = typing.Union[
+    EmojiDrawEntity, NewLineDrawEntity, TextDrawEntity
+]
 
 
-def type_cast[
-    T
-](value: typing.Any, expected_type: type[T],) -> T:  # noqa: ARG001
+T = typing.TypeVar("T")
+
+
+def type_cast(
+    value: typing.Any,
+    expected_type: type[T],  # noqa: ARG001
+) -> T:
     return value

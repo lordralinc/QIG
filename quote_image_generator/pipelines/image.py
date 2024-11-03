@@ -1,6 +1,7 @@
 import io
 import typing
 
+import typing_extensions
 from PIL import Image, ImageDraw
 
 from quote_image_generator.generator import QuoteGenerator
@@ -25,9 +26,9 @@ class ImagePipeLine(RedirectKeywordPipeLine):
         generator: QuoteGenerator,
         *,
         box: SizeBox,
-        image: bytes | Image.Image,
+        image: typing.Union[bytes, Image.Image],
         **kwargs,
-    ) -> None | dict[str, typing.Any]:
+    ) -> None:
         image = (
             image
             if isinstance(image, Image.Image)
@@ -43,7 +44,7 @@ class ImagePipeLine(RedirectKeywordPipeLine):
 
 class CircleImagePipeLine(ImagePipeLine):
 
-    @typing.override
+    @typing_extensions.override
     def get_mask(self, image: Image.Image) -> Image.Image:
         mask = Image.new("L", image.size, 0)
         ImageDraw.Draw(mask).ellipse((0, 0, *image.size), fill=255)
@@ -52,7 +53,7 @@ class CircleImagePipeLine(ImagePipeLine):
 
 class RoundedImagePipeLine(ImagePipeLine):
 
-    @typing.override
+    @typing_extensions.override
     def get_mask(self, image: Image.Image) -> Image.Image:
         mask = Image.new("L", image.size, 0)
         ImageDraw.Draw(mask).rounded_rectangle(

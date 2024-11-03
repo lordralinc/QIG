@@ -2,8 +2,9 @@ import typing
 
 from PIL.Image import Image
 
+from quote_image_generator.image_draw import CustomImageDraw
 from quote_image_generator.pipelines.base import RedirectKeywordPipeLine
-from quote_image_generator.types import DrawEntity, InputEntity, SizeBox
+from quote_image_generator.types import DrawEntity, InputEntity, Point, Size, SizeBox
 
 __all__ = ("EntitiesPipeLine",)
 
@@ -30,12 +31,13 @@ class EntitiesPipeLine(RedirectKeywordPipeLine):
         box: SizeBox,
         vertical_align: typing.Literal["top", "middle", "bottom"] = "middle",
         horizontal_align: typing.Literal["left", "middle", "right"] = "middle",
-        input_text: str | None = None,
-        input_enitites: list[InputEntity] | None = None,
-        draw_entities: list[DrawEntity] | None = None,
+        input_text: typing.Optional[str] = None,
+        input_enitites: typing.Optional[list[InputEntity]] = None,
+        draw_entities: typing.Optional[list[DrawEntity]] = None,
         max_font_size: int = 128,
+        debug: bool = False,
         **kwargs,
-    ) -> None | dict[str, typing.Any]:
+    ) -> None:
         if input_text:
             entities = generator.entities_processor.convert_input_to_draw_entity(
                 input_text,
@@ -47,10 +49,6 @@ class EntitiesPipeLine(RedirectKeywordPipeLine):
         if entities is None:
             raise ValueError("Entities must be set")
 
-        font_size, text_size = generator.text_processor.get_entities_size(
-            entities, box, max_font_size
-        )
-
         generator.text_processor.draw_entities(
             im,
             entities,
@@ -59,3 +57,6 @@ class EntitiesPipeLine(RedirectKeywordPipeLine):
             vertical_align=vertical_align,
             max_font_size=max_font_size,
         )
+        if debug:
+            draw = CustomImageDraw(im)
+            draw.anchor(Point(box.x, box.y), Size(50, 50), fill=(255, 0, 0, 75))

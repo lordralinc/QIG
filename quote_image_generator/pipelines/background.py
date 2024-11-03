@@ -2,6 +2,7 @@ import typing
 
 from PIL import Image, ImageColor, ImageDraw
 
+from quote_image_generator.image_draw import CustomImageDraw
 from quote_image_generator.pipelines.base import BasePipeLine
 from quote_image_generator.types import Color
 
@@ -17,9 +18,13 @@ class StaticColorBackgroundPipeLine(BasePipeLine):
         generator: "QuoteGenerator",
         *,
         background_color: Color,
+        debug: bool,
         **kwargs,
     ) -> None:
         im.paste(Image.new("RGBA", im.size, background_color))
+        if debug:
+            draw = CustomImageDraw(im)
+            draw.grid(fill=(0, 255, 0, 75), style="dashed")
 
 
 class GradientBackgroundPipeLine(BasePipeLine):
@@ -36,6 +41,7 @@ class GradientBackgroundPipeLine(BasePipeLine):
         background_from_color: Color,
         background_to_color: Color,
         background_direction: typing.Literal["l-r", "t-b", "lt-rb", "rt-lb"] = "t-b",
+        debug: bool = False,
         **kwargs,
     ) -> None:
         width, height = im.size
@@ -46,6 +52,9 @@ class GradientBackgroundPipeLine(BasePipeLine):
             width, height, background_from_color, background_to_color, background_direction
         )
         im.paste(gradient, (0, 0), gradient)
+        if debug:
+            draw = CustomImageDraw(im)
+            draw.grid(fill=(0, 255, 0, 75), style="dashed")
 
     def _create_gradient(
         self,

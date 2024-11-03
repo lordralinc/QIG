@@ -1,21 +1,29 @@
 import io
+import logging
+import typing
 
 from PIL import Image
 
 from quote_image_generator.pipelines.base import BasePipeLine
 from quote_image_generator.processors.entities import EntitiesProcessor
-from quote_image_generator.processors.text_processor import TextProcessor
+from quote_image_generator.processors.text import TextProcessor
+
+__all__ = ("QuoteGenerator",)
+
+
+logger = logging.getLogger(__name__)
 
 
 class QuoteGenerator:
 
     def __init__(
         self,
-        bi: bytes | Image.Image | tuple[int, int],
+        bi: typing.Union[bytes, Image.Image, tuple[int, int]],
         pipeline: list[BasePipeLine],
         *,
         text_processor: TextProcessor,
         entities_processor: EntitiesProcessor,
+        debug: bool = False,
         **kwargs,
     ) -> None:
         self.base_image = (
@@ -27,7 +35,7 @@ class QuoteGenerator:
                 else Image.open(io.BytesIO(bi)).convert("RGBA")
             )
         )
-        self.kwargs = kwargs.copy()
+        self.kwargs = {**kwargs, "debug": debug}
         self.text_processor = text_processor
         self.entities_processor = entities_processor
 
@@ -40,7 +48,8 @@ class QuoteGenerator:
         quote_image = self.base_image.copy().convert("RGBA")
 
         for pipe in self.pipeline:
-            pipe_result = pipe.pipe(quote_image, self, **pipeline_kwargs)
+            logger.debug(f"Run pipe: {pipe.__class__.__name__}")
+            pipe_result = pipe.pipe(quote_image, self, **pipeline_kwargs, **pipe.pipe_kwargs)
             if pipe_result:
                 pipeline_kwargs.update(pipe_result)
 

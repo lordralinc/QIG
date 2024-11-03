@@ -3,8 +3,10 @@ import math
 import pathlib
 import typing
 
+import typing_extensions
 from PIL import Image, ImageDraw, ImageFont
 
+from quote_image_generator.image_draw import CustomImageDraw
 from quote_image_generator.processors.emoji import ABCEmojiSource
 from quote_image_generator.types import (
     DrawEntity,
@@ -29,7 +31,7 @@ class TextProcessor:
         self,
         text: str,
         max_box_size: Size,
-        font_path: pathlib.Path | str,
+        font_path: typing.Union[pathlib.Path, str],
         max_font_size: int,
     ) -> tuple[int, Size]:
 
@@ -88,7 +90,7 @@ class TextProcessor:
 
     def draw_single_line(
         self,
-        image: Image.Image | ImageDraw.ImageDraw,
+        image: typing.Union[Image.Image, ImageDraw.ImageDraw],
         anchor: Point,
         entity: TextDrawEntity,
         font_size: int,
@@ -152,6 +154,7 @@ class TextProcessor:
                     "bold",
                     "link",
                     "underline",
+                    "strikethrough",
                     "code_block",
                     "quote",
                 ):
@@ -172,7 +175,7 @@ class TextProcessor:
                         current_position.x + text_size.width, current_position.y
                     )
                 else:
-                    typing.assert_never(entity["type"])
+                    typing_extensions.assert_never(entity["type"])
 
                 max_current_size = Size(
                     max(max_current_size.width, current_position.x),
@@ -190,7 +193,7 @@ class TextProcessor:
 
     def draw_entities(
         self,
-        image: Image.Image | ImageDraw.ImageDraw,
+        image: typing.Union[Image.Image, ImageDraw.ImageDraw],
         entities: list[DrawEntity],
         box: SizeBox,
         horizontal_align: typing.Literal["left", "middle", "right"],
@@ -199,7 +202,7 @@ class TextProcessor:
     ) -> None:
 
         image = image if isinstance(image, Image.Image) else image._image
-        draw = ImageDraw.Draw(image)
+        draw = CustomImageDraw(image)
 
         font_size, entities_size = self.get_entities_size(
             entities, box, max_font_size=max_font_size
@@ -244,11 +247,12 @@ class TextProcessor:
                 current_position = Point(anchor.x, current_position.y + font_size)
             elif entity["type"] in (
                 "default",
-                "italic",
-                "code",
-                "bold",
                 "link",
+                "bold",
+                "italic",
                 "underline",
+                "strikethrough",
+                "code",
                 "code_block",
                 "quote",
             ):
@@ -258,6 +262,22 @@ class TextProcessor:
                     encoding="utf-8",
                 )
                 emoji_size = math.floor(font_size * self.emoji_source.emoji_scale)
+
+                if entity["type"] in ("code_block", "quote"):
+                    line_width = math.floor(1 / 17 * font_size) or 1
+                    draw.line(
+                        (
+                            current_position.x,
+                            current_position.y + math.ceil(line_width * 1.3),
+                            current_position.x,
+                            current_position.y + line_width + font_size,
+                        ),
+                        fill=entity["color"],
+                        width=line_width,
+                    )
+                    current_position = Point(
+                        current_position.x + line_width + 5, current_position.y
+                    )
                 for chunk in self.emoji_source.chunk_by_emoji(entity["content"]):
                     if chunk["type"] == "emoji":
 
@@ -279,12 +299,28 @@ class TextProcessor:
                             current_position.y,
                         )
                     else:
-                        draw.text(
-                            current_position,
-                            chunk["content"],
-                            font=font,
-                            fill=entity["color"],
-                        )
+
+                        if entity["type"] == "underline":
+                            draw.underline_text(
+                                current_position,
+                                chunk["content"],
+                                font=font,
+                                fill=entity["color"],
+                            )
+                        elif entity["type"] == "strikethrough":
+                            draw.strikethrough_text(
+                                current_position,
+                                chunk["content"],
+                                font=font,
+                                fill=entity["color"],
+                            )
+                        else:
+                            draw.text(
+                                current_position,
+                                chunk["content"],
+                                font=font,
+                                fill=entity["color"],
+                            )
                         current_position = Point(
                             current_position.x + math.ceil(font.getlength(chunk["content"])),
                             current_position.y,

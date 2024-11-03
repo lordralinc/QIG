@@ -3,8 +3,9 @@ import typing
 
 from PIL.Image import Image
 
+from quote_image_generator.image_draw import CustomImageDraw
 from quote_image_generator.pipelines.base import RedirectKeywordPipeLine
-from quote_image_generator.types import Color, FontSet, Point, SizeBox, TextDrawEntity
+from quote_image_generator.types import Color, FontSet, Point, Size, SizeBox, TextDrawEntity
 
 if typing.TYPE_CHECKING:
     from quote_image_generator.generator import QuoteGenerator
@@ -33,12 +34,13 @@ class TextPipeLine(RedirectKeywordPipeLine):
         content: str,
         box: SizeBox,
         color: Color = (255, 255, 255),
-        font: str | typing.Callable[[FontSet], str] = lambda fontset: fontset.bold,
+        font: typing.Union[str, typing.Callable[[FontSet], str]] = lambda fontset: fontset.bold,
         vertical_align: typing.Literal["top", "middle", "bottom"] = "middle",
         horizontal_align: typing.Literal["left", "middle", "right"] = "middle",
         max_font_size: int = 128,
+        debug: bool = False,
         **kwargs,
-    ) -> None | dict[str, typing.Any]:
+    ) -> None:
         if not isinstance(font, str):
             font = font(generator.entities_processor.fontset)
         font_size, text_size = generator.text_processor.get_line_size_by_box(
@@ -74,3 +76,6 @@ class TextPipeLine(RedirectKeywordPipeLine):
             font_size=font_size,
             emoji_size=math.floor(font_size * generator.text_processor.emoji_source.emoji_scale),
         )
+        if debug:
+            draw = CustomImageDraw(im)
+            draw.anchor(Point(box.x, box.y), Size(50, 50), fill=(255, 0, 0, 75))

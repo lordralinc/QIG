@@ -1,6 +1,6 @@
 from .emoji import ABCEmojiSource, ChunkResult, FileEmojiSource
 from .entities import EntitiesProcessor
-from .text_processor import TextProcessor
+from .text import TextProcessor
 
 __all__ = (
     "ABCEmojiSource",

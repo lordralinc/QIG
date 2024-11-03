@@ -10,12 +10,6 @@
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal"
-    },
-    {
-      "name": "Отладчик Python: Модуль",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "quote_image_generator"
     }
   ]
 }

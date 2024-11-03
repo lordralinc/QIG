@@ -5,6 +5,7 @@ from quote_image_generator.types import (
     EmojiDrawEntity,
     FontSet,
     InputEntity,
+    InputEntityType,
     NewLineDrawEntity,
     TextDrawEntity,
     TextDrawEntityTypes,
@@ -19,13 +20,15 @@ class EntitiesProcessor:
     def __init__(self, fontset: FontSet, colorset: ColorSet) -> None:
         self.fontset = fontset
         self.colorset = colorset
-        self.font_table = {
+        self.font_table: dict[InputEntityType, str] = {
             "bold": self.fontset.bold,
+            "underline": self.fontset.default,
+            "strikethrough": self.fontset.default,
             "italic": self.fontset.italic,
             "code": self.fontset.mono,
             "code_block": self.fontset.mono,
+            "quote": self.fontset.default,
             "link": self.fontset.italic,
-            "underline": self.fontset.default,
         }
 
     def _split_new_line_content(self, entity: DrawEntity) -> list[DrawEntity]:
