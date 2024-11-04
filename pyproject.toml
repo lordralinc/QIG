@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quote-image-generator"
-version = "0.1.1"
+version = "0.1.2"
 description = "Create beautiful, customizable images with quotes, supporting unique font styles and emojis"
 authors = ["lordralinc <lordralinc@gmail.com>"]
 readme = "README.md"

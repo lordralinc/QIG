@@ -13,6 +13,35 @@ if typing.TYPE_CHECKING:
 
 
 class EntitiesPipeLine(RedirectKeywordPipeLine):
+    """
+    `EntitiesPipeLine` is a pipeline class designed to draw entities (text and related visual elements)
+    within a specified area on an image. It allows detailed configuration of text positioning,
+    alignment, and scaling to fit the defined bounding box. This pipeline is ideal for applications
+    that need precise text placement and layout customization.
+
+    Class Variables:
+    - `REQUIRED_ARGS` (list[str]): Specifies "box" as a required argument.
+    - `OPTIONAL_ARGS` (list[str]): Defines optional arguments, including:
+        - `vertical_align`, `horizontal_align`: Control the alignment of entities within the box.
+        - `input_text`: Text to convert into drawable entities.
+        - `input_entities`, draw_entities: Input or pre-drawn entities for customization.
+        - `max_font_size`: Maximum font size for drawing entities.
+
+    Parameters:
+    - `box` (SizeBox): The bounding box where entities will be drawn.
+    - `vertical_align` (Literal["top", "middle", "bottom"]): Vertical alignment of entities within the box.
+    - `horizontal_align` (Literal["left", "middle", "right"]): Horizontal alignment of entities within the box.
+    - `input_text` (Optional[str]): Text content to convert into drawable entities if provided.
+    - `input_entities` (Optional[list[InputEntity]]): List of input entities for custom drawing.
+    - `draw_entities` (Optional[list[DrawEntity]]): List of pre-created drawable entities to render.
+    - `max_font_size` (int): Maximum font size allowed for entities. Defaults to 128.
+    - `debug` (bool): When True, renders an anchor marker at the box origin for alignment reference.
+
+    Methods:
+    - `_pipe`: Converts input text to entities or directly draws given entities within the box.
+      Aligns entities based on the specified parameters and optionally marks the anchor for debugging.
+    """
+
     REQUIRED_ARGS: typing.ClassVar[list[str]] = ["box"]
     OPTIONAL_ARGS: typing.ClassVar[list[str]] = [
         "vertical_align",

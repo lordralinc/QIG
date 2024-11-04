@@ -10,6 +10,13 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 
+__all__ = (
+    "ChunkResult",
+    "ABCEmojiSource",
+    "FileEmojiSource",
+)
+
+
 class ChunkResult(typing.TypedDict):
     type: typing.Literal["emoji", "text"]
     content: str
@@ -26,7 +33,7 @@ class ABCEmojiSource(abc.ABC):
     def is_emoji(self, emoji_id: str) -> bool: ...
     @abc.abstractmethod
     def get_emoji_regex(self) -> re.Pattern: ...
-
+    @functools.lru_cache(maxsize=128)  # noqa: B019
     def chunk_by_emoji(self, text: str) -> list[ChunkResult]:
         chunks = []
         for chunk in self.get_emoji_regex().split(text):

@@ -14,6 +14,41 @@ __all__ = ("TextPipeLine",)
 
 
 class TextPipeLine(RedirectKeywordPipeLine):
+    """
+    `TextPipeLine` is a pipeline class for rendering text within a defined area on an image.
+    It supports flexible positioning, alignment, and font scaling, allowing for dynamic text
+    overlay that adapts to the specified bounding box and alignment options.
+
+    Class Variables:
+    - `REQUIRED_ARGS` (list[str]): Specifies "content" and "box" as required arguments.
+    - `OPTIONAL_ARGS` (list[str]): Defines optional arguments, including:
+        - `color`: Sets the color of the text (default is white).
+        - `font`: Specifies the font style, which can be a path or a callable for font selection.
+        - `vertical_align`, `horizontal_align`: Control text alignment within the box.
+        - `max_font_size`: Limits the maximum font size for fitting the text within the box.
+
+    Parameters:
+    - `content` (str): The text content to display within the bounding box.
+    - `box` (SizeBox): The bounding area on the image where text will be rendered.
+    - `color` (Color): Text color as an RGB or RGBA tuple. Defaults to white (255, 255, 255).
+    - `font` (Union[str, Callable[[FontSet], str]]): Font file path or a callable for dynamic font selection.
+    - `vertical_align` (Literal["top", "middle", "bottom"]): Specifies vertical alignment of the text.
+    - `horizontal_align` (Literal["left", "middle", "right"]): Specifies horizontal alignment of the text.
+    - `max_font_size` (int): Maximum font size for scaling text within the box.
+    - `debug` (bool): When True, displays a marker at the top-left corner of the box for alignment debugging.
+
+    Methods:
+    - `_pipe`: Positions and draws the text within the box, applying scaling to fit the content
+      according to the specified maximum font size. Adjusts alignment based on parameters
+      and draws the text on the image.
+
+    Example:
+        ```
+        pipeline = TextPipeLine(content="Sample Text", box=some_box, color=(0, 0, 0), max_font_size=100)
+        pipeline.pipe(im, generator)
+        ```
+    """
+
     REQUIRED_ARGS: typing.ClassVar[list[str]] = [
         "content",
         "box",
