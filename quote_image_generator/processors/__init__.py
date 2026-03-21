@@ -4,8 +4,8 @@ from .text import TextProcessor
 
 __all__ = (
     "ABCEmojiSource",
-    "FileEmojiSource",
     "ChunkResult",
     "EntitiesProcessor",
+    "FileEmojiSource",
     "TextProcessor",
 )

@@ -1,3 +1,5 @@
+import typing
+
 from quote_image_generator.types import (
     Color,
     ColorSet,
@@ -9,14 +11,12 @@ from quote_image_generator.types import (
     NewLineDrawEntity,
     TextDrawEntity,
     TextDrawEntityTypes,
-    type_cast,
 )
 
 __all__ = ("EntitiesProcessor",)
 
 
 class EntitiesProcessor:
-
     def __init__(self, fontset: FontSet, colorset: ColorSet) -> None:
         self.fontset = fontset
         self.colorset = colorset
@@ -42,7 +42,7 @@ class EntitiesProcessor:
 
         for index, line in enumerate(lines, 1):
             if line:
-                ent = type_cast(entity, TextDrawEntity)
+                ent = typing.cast("TextDrawEntity", entity)
                 entities.append(
                     TextDrawEntity(
                         type=ent["type"],
@@ -104,9 +104,7 @@ class EntitiesProcessor:
         )
         return self._split_new_line_content(default_entity)
 
-    def convert_input_to_draw_entity(
-        self, text: str, entities: list[InputEntity]
-    ) -> list[DrawEntity]:
+    def convert_input_to_draw_entity(self, text: str, entities: list[InputEntity]) -> list[DrawEntity]:
         draw_entities = []
         index = 0
         while index < len(text):
@@ -117,7 +115,7 @@ class EntitiesProcessor:
                     if entity["type"] in self.font_table:
                         draw_entities.extend(self._create_text_entities(text, entity))
                     elif entity["type"] == "emoji":
-                        ent = type_cast(entity, EmojiDrawEntity)
+                        ent = typing.cast("EmojiDrawEntity", entity)
                         draw_entities.append({**ent, "emoji_image": ent["emoji_image"]})
                     index += entity["length"]
                     break

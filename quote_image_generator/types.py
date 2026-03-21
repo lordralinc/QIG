@@ -3,21 +3,20 @@ import typing
 import typing_extensions
 
 __all__ = (
-    "Point",
-    "Size",
-    "SizeBox",
-    "PointBox",
-    "FontSet",
     "Color",
     "ColorSet",
-    "InputEntityType",
-    "InputEntity",
-    "EmojiDrawEntity",
-    "NewLineDrawEntity",
-    "TextDrawEntityTypes",
-    "TextDrawEntity",
     "DrawEntity",
-    "type_cast",
+    "EmojiDrawEntity",
+    "FontSet",
+    "InputEntity",
+    "InputEntityType",
+    "NewLineDrawEntity",
+    "Point",
+    "PointBox",
+    "Size",
+    "SizeBox",
+    "TextDrawEntity",
+    "TextDrawEntityTypes",
 )
 
 
@@ -78,9 +77,7 @@ class FontSet(typing.NamedTuple):
     mono: str
 
 
-Color: typing_extensions.TypeAlias = typing.Union[
-    str, tuple[int, int, int], tuple[int, int, int, int]
-]
+Color: typing_extensions.TypeAlias = typing.Union[str, tuple[int, int, int], tuple[int, int, int, int]]  # noqa: UP007
 
 
 class ColorSet(typing.NamedTuple):
@@ -145,16 +142,4 @@ class TextDrawEntity(typing.TypedDict):
     color: Color
 
 
-DrawEntity: typing_extensions.TypeAlias = typing.Union[
-    EmojiDrawEntity, NewLineDrawEntity, TextDrawEntity
-]
-
-
-T = typing.TypeVar("T")
-
-
-def type_cast(
-    value: typing.Any,
-    expected_type: type[T],  # noqa: ARG001
-) -> T:
-    return value
+DrawEntity: typing_extensions.TypeAlias = typing.Union[EmojiDrawEntity, NewLineDrawEntity, TextDrawEntity]  # noqa: UP007

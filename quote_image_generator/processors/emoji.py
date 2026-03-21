@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 __all__ = (
-    "ChunkResult",
     "ABCEmojiSource",
+    "ChunkResult",
     "FileEmojiSource",
 )
 
@@ -23,7 +23,6 @@ class ChunkResult(typing.TypedDict):
 
 
 class ABCEmojiSource(abc.ABC):
-
     def __init__(self, emoji_scale: float = 1.1) -> None:
         self.emoji_scale = emoji_scale
 
@@ -54,7 +53,6 @@ class ABCEmojiSource(abc.ABC):
 
 
 class FileEmojiSource(ABCEmojiSource):
-
     def __init__(self, emoji_dir: pathlib.Path = pathlib.Path("emoji"), emoji_scale: float = 1.1):
         self.emoji_dir = emoji_dir
         super().__init__(emoji_scale=emoji_scale)
@@ -121,7 +119,5 @@ class FileEmojiSource(ABCEmojiSource):
                 if child.name == "img":
                     emoji_data_txt = child.attrs["src"]
                     outfile = pathlib.Path("emoji", emoji_code_txt + ".png")
-                    outfile.write_bytes(
-                        base64.b64decode(emoji_data_txt.replace("data:image/png;base64,", ""))
-                    )
+                    outfile.write_bytes(base64.b64decode(emoji_data_txt.replace("data:image/png;base64,", "")))
                     logger.debug(f"Downloaded emoji {emoji_code_txt} to {outfile}")
